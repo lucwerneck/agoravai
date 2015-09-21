@@ -188,6 +188,12 @@ namespace BaseUltPlus
 
             foreach (var recall in Recalls.OrderBy(h => h.Started))
             {
+                if ((recall.Unit.IsAlly && !Program.BaseUltMenu["showallies"].Cast<CheckBox>().CurrentValue) ||
+                    (recall.Unit.IsAlly && !Program.BaseUltMenu["showenemies"].Cast<CheckBox>().CurrentValue))
+                {
+                    continue;
+                }
+
                 var recallDuration = recall.Duration;
 
                 if (recall.Status == RecallStatus.Active)

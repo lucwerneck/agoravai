@@ -15,7 +15,6 @@ namespace BaseUltPlus
         {
             // Wait till the name has fully loaded
             Loading.OnLoadingComplete += LoadingOnOnLoadingComplete;
-            Console.Clear();
         }
 
         private static void LoadingOnOnLoadingComplete(EventArgs args)
@@ -26,6 +25,8 @@ namespace BaseUltPlus
             BaseUltMenu.AddSeparator();
             BaseUltMenu.Add("baseult", new CheckBox("BaseUlt"));
             BaseUltMenu.Add("showrecalls", new CheckBox("Show Recalls"));
+            BaseUltMenu.Add("showallies", new CheckBox("Show Allies"));
+            BaseUltMenu.Add("showenemies", new CheckBox("Show Enemies"));
             BaseUltMenu.AddSeparator();
             BaseUltMenu.Add("timeLimit", new Slider("FOW Time Limit (SEC)", 20, 0, 120));
             BaseUltMenu.AddSeparator();
