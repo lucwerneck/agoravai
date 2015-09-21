@@ -26,8 +26,8 @@ namespace BaseUltPlus
         private static Sprite Bar;
         private static Sprite Warning;
         private static Sprite Underline;
-        private static readonly int X = (int) TacticalMap.X- 20;
-        private static readonly int Y = (int) TacticalMap.Y - 200;
+        private static int X = (int) TacticalMap.X- 20;
+        private static int Y = (int) TacticalMap.Y - 200;
         private const int Length = 260;
         private const int Height = 25;
         private const int LineThickness = 4;
@@ -36,6 +36,8 @@ namespace BaseUltPlus
 
         public static void Initialize()
         {
+            Program.BaseUltMenu["x"].Cast<Slider>().OnValueChange += OffsetOnOnValueChange;
+            Program.BaseUltMenu["y"].Cast<Slider>().OnValueChange += OffsetOnOnValueChange;
             Text = new EloBuddy.SDK.Rendering.Text("", new FontDescription
             {
                 FaceName = "Calibri",
@@ -76,6 +78,18 @@ namespace BaseUltPlus
                 BaseUltSpells.Add(new BaseUltSpell("Ziggs", SpellSlot.Q, 250, 3100, 0, false));
                 BaseUltSpells.Add(new BaseUltSpell("Lux", SpellSlot.R, 1375, 0, 0, false));
                 BaseUltSpells.Add(new BaseUltSpell("Xerath", SpellSlot.R, 700, 600, 0, false));
+            }
+        }
+
+        private static void OffsetOnOnValueChange(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs args)
+        {
+            if (sender.SerializationId == Program.BaseUltMenu["x"].Cast<Slider>().SerializationId)
+            {
+                X = (int) TacticalMap.X + (- 20 + args.NewValue);
+            }
+            else
+            {
+                Y = (int)TacticalMap.Y + (- 200+args.NewValue);
             }
         }
 
