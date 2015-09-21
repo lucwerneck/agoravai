@@ -439,7 +439,7 @@ namespace BaseUltPlus
             }
         }
 
-        public static void OnTeleport(Obj_AI_Base sender, TeleportEventArgs args)
+        public static void OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
         {
             var unit = Recalls.Find(h => h.Unit.NetworkId == sender.NetworkId);
 
