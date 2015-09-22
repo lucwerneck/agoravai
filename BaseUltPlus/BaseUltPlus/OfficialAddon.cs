@@ -306,19 +306,19 @@ namespace BaseUltPlus
             {
                 case GameMapId.SummonersRift:
                 {
-                    return Player.Team == GameObjectTeam.Chaos
+                    return Player.Team == GameObjectTeam.Order
                         ? new Vector3(14296, 14362, 171)
                         : new Vector3(408, 414, 182);
                 }
                 case GameMapId.CrystalScar:
                 {
-                    return Player.Team == GameObjectTeam.Chaos
+                    return Player.Team == GameObjectTeam.Order
                         ? new Vector3(524, 4164, 35)
                         : new Vector3(13323, 4105, 36);
                 }
                 case GameMapId.TwistedTreeline:
                 {
-                    return Player.Team == GameObjectTeam.Chaos 
+                    return Player.Team == GameObjectTeam.Order 
                         ? new Vector3(1060, 7297, 150) 
                         : new Vector3(14353, 7297, 150);
                 }
