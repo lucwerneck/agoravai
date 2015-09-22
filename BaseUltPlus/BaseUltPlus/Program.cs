@@ -15,15 +15,6 @@ namespace BaseUltPlus
         {
             // Wait till the name has fully loaded
             Loading.OnLoadingComplete += LoadingOnOnLoadingComplete;
-            Game.OnDisconnect += OnDisconnect;
-        }
-
-        private static void OnDisconnect(EventArgs args)
-        {
-            foreach (var unit in HeroManager.Enemies)
-            {
-                BaseUltMenu.Remove("target" + unit.NetworkId);
-            }
         }
 
         private static void LoadingOnOnLoadingComplete(EventArgs args)
