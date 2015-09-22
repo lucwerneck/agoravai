@@ -101,7 +101,7 @@ namespace AutoLevelPlus
                 return;
             }
 
-            if (Player.Instance.Level <= 3)
+            if (Player.Instance.Level <= 3 && AutoLevelMenu["autolevelplus." + ChampionName + ".easy.qwe"].Cast<CheckBox>().CurrentValue)
             {
                 foreach (var lvl in SimpleLvLs)
                 {
