@@ -15,6 +15,15 @@ namespace BaseUltPlus
         {
             // Wait till the name has fully loaded
             Loading.OnLoadingComplete += LoadingOnOnLoadingComplete;
+            Game.OnDisconnect += OnDisconnect;
+        }
+
+        private static void OnDisconnect(EventArgs args)
+        {
+            foreach (var unit in HeroManager.Enemies)
+            {
+                BaseUltMenu.Remove("target" + unit.NetworkId);
+            }
         }
 
         private static void LoadingOnOnLoadingComplete(EventArgs args)
@@ -37,7 +46,7 @@ namespace BaseUltPlus
             BaseUltMenu.AddGroupLabel("BaseUlt+ Targets");
             foreach (var unit in HeroManager.Enemies)
             {
-                BaseUltMenu.Add("target" + unit.NetworkId, new CheckBox(string.Format("{0} ({1})", unit.ChampionName, unit.Name)));
+                BaseUltMenu.Add("target" + unit.ChampionName, new CheckBox(string.Format("{0} ({1})", unit.ChampionName, unit.Name)));
             }
             BaseUltMenu.AddGroupLabel("BaseUlt+ Credits");
             BaseUltMenu.AddLabel("By: LunarBlue");

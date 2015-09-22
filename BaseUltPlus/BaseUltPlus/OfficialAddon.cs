@@ -428,7 +428,7 @@ namespace BaseUltPlus
             var collision = false; //todo add colision
             if (fireTime > Game.Time && fireTime < recall.Started + recall.Duration &&
                 recall.Unit.Health < spellDmg &&
-                Program.BaseUltMenu["target" + recall.Unit.NetworkId].Cast<CheckBox>().CurrentValue &&
+                Program.BaseUltMenu["target" + recall.Unit.ChampionName].Cast<CheckBox>().CurrentValue &&
                 Program.BaseUltMenu["baseult"].Cast<CheckBox>().CurrentValue && !Program.BaseUltMenu["nobaseult"].Cast<KeyBind>().CurrentValue)
             {
                 BaseUltUnits.Add(new BaseUltUnit(recall.Unit, fireTime, collision));
