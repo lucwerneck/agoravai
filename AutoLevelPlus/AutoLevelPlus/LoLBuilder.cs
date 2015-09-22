@@ -12,8 +12,6 @@ namespace AutoLevelPlus
 
     class LoLBuilder
     {
-
-        [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
         public static int[] GetSkillSequence(string cname)
         {
             WebClient pbClient = new WebClient();
