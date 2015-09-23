@@ -27,6 +27,7 @@ namespace BaseUltPlus
             BaseUltMenu.Add("showrecalls", new CheckBox("Show Recalls"));
             BaseUltMenu.Add("showallies", new CheckBox("Show Allies"));
             BaseUltMenu.Add("showenemies", new CheckBox("Show Enemies"));
+            BaseUltMenu.Add("checkcollision", new CheckBox("Check Collision"));
             BaseUltMenu.AddSeparator();
             BaseUltMenu.Add("timeLimit", new Slider("FOW Time Limit (SEC)", 20, 0, 120));
             BaseUltMenu.AddSeparator();

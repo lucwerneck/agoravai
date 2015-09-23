@@ -32,8 +32,6 @@ namespace BaseUltPlus
         private const int Height = 25;
         private const int LineThickness = 4;
 
-        //todo Collision, 
-
         public static void Initialize()
         {
             Program.BaseUltMenu["x"].Cast<Slider>().OnValueChange += OffsetOnOnValueChange;
@@ -153,12 +151,17 @@ namespace BaseUltPlus
 
             foreach (var unit in BaseUltUnits)
             {
+                if (Program.BaseUltMenu["checkcollision"].Cast<CheckBox>().CurrentValue && unit.Collision)
+                {
+                    return;
+                }
+
                 if (unit.Unit.IsVisible)
                 {
                     unit.LastSeen = Game.Time;
                 }
                 var timeLimit = Program.BaseUltMenu["timeLimit"].Cast<Slider>().CurrentValue;
-                if (Math.Round(unit.FireTime, 2) == Math.Round(Game.Time, 2) && Game.Time - timeLimit <= unit.LastSeen)
+                if (Math.Round(unit.FireTime, 2) == Math.Round(Game.Time, 2) && Game.Time - timeLimit >= unit.LastSeen)
                 {
                     var spell = Player.Spellbook.GetSpell(BaseUltSpells.Find(h => h.Name == Player.ChampionName).Slot);
                     if (spell.IsReady)
@@ -425,7 +428,7 @@ namespace BaseUltPlus
             var timeNeeded = GetBaseUltTravelTime(spellData.Delay, spellData.Speed);
             var fireTime = finishedRecall - timeNeeded;
             var spellDmg = GetBaseUltSpellDamage(spellData, recall.Unit);
-            var collision = false; //todo add colision
+            var collision = GetCollision(spellData.Radius).Any();
             if (fireTime > Game.Time && fireTime < recall.Started + recall.Duration &&
                 recall.Unit.Health < spellDmg &&
                 Program.BaseUltMenu["target" + recall.Unit.ChampionName].Cast<CheckBox>().CurrentValue &&
@@ -473,6 +476,23 @@ namespace BaseUltPlus
                     break;
                 }
             }
+        }
+
+        private static List<Obj_AI_Base> GetCollision(float spellwidth)
+        {
+            var collisionList = new List<Obj_AI_Base>();
+            foreach (var unit in HeroManager.Enemies.Where(h => Player.Distance(h) < 2000))
+            {
+                var endpos = Player.ServerPosition.Extend(GetFountainPos(), 2000);
+                var projectOn = unit.ServerPosition.To2D()
+                    .ProjectOn(Player.ServerPosition.To2D(), endpos);
+                if (projectOn.SegmentPoint.Distance(endpos) < spellwidth + unit.BoundingRadius)
+                {
+                    collisionList.Add(unit);
+                }
+            }
+
+            return collisionList;
         }
     }
 
