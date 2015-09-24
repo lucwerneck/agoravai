@@ -428,7 +428,7 @@ namespace BaseUltPlus
             var timeNeeded = GetBaseUltTravelTime(spellData.Delay, spellData.Speed);
             var fireTime = finishedRecall - timeNeeded;
             var spellDmg = GetBaseUltSpellDamage(spellData, recall.Unit);
-            var collision = GetCollision(spellData.Radius).Any();
+            var collision = GetCollision(spellData.Radius, spellData).Any();
             if (fireTime > Game.Time && fireTime < recall.Started + recall.Duration &&
                 recall.Unit.Health < spellDmg &&
                 Program.BaseUltMenu["target" + recall.Unit.ChampionName].Cast<CheckBox>().CurrentValue &&
@@ -478,13 +478,15 @@ namespace BaseUltPlus
             }
         }
 
-        private static List<Obj_AI_Base> GetCollision(float spellwidth)
+        private static List<Obj_AI_Base> GetCollision(float spellwidth, BaseUltSpell spell)
         {
             var collisionList = new List<Obj_AI_Base>();
             foreach (var unit in HeroManager.Enemies.Where(h => Player.Distance(h) < 2000))
             {
+                var pred = Prediction.Position.PredictLinearMissile(unit, 2000, (int) spell.Radius, (int)spell.Delay,
+                    spell.Speed, -1);
                 var endpos = Player.ServerPosition.Extend(GetFountainPos(), 2000);
-                var projectOn = unit.ServerPosition.To2D()
+                var projectOn = pred.UnitPosition.To2D()
                     .ProjectOn(Player.ServerPosition.To2D(), endpos);
                 if (projectOn.SegmentPoint.Distance(endpos) < spellwidth + unit.BoundingRadius)
                 {
