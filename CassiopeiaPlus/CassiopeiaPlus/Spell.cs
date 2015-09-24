@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using EloBuddy;
+﻿using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
 using SharpDX;
@@ -131,7 +130,7 @@ namespace CassiopeiaPlus
                     case SkillshotType.Circular:
                         return Prediction.Position.PredictCircularMissile(target, Range, Width, Delay, Speed, SourcePosition);
                     case SkillshotType.Cone:
-                        return Prediction.Position.PredictConeSpell(target, Range, Width, Delay, SourcePosition);
+                        return Prediction.Position.PredictConeSpell(target, Range, Width, Delay, Speed, SourcePosition);
                 }
             }
             return null;
@@ -145,7 +144,7 @@ namespace CassiopeiaPlus
                     case SkillshotType.Circular:
                         return Prediction.Position.PredictCircularMissileAoe(targets, Range, Width, Delay, Speed, SourcePosition);
                     case SkillshotType.Cone:
-                        return Prediction.Position.PredictConeSpellAoe(targets, Range, Width, Delay, SourcePosition);
+                        return Prediction.Position.PredictConeSpellAoe(targets, Range, Width, Delay, Speed, SourcePosition);
                 }
             }
             return null;
@@ -207,28 +206,11 @@ namespace CassiopeiaPlus
             get { return Player.Instance.Spellbook.IsCharging && ChargedStarted + (ChargedDelay / 1000f) > Game.Time; }
         }
 
-        public FarmLocation GetCircularFarmLocation(List<Vector2> minionPositions,
-            float overrideWidth = -1)
-        {
-            return Instances.GetBestCircularFarmLocation( minionPositions, overrideWidth >= 0 ? overrideWidth : Width, Range);
-        }
         public enum SkillshotType
         {
             Linear,
             Circular,
             Cone
-        }
-
-        public class FarmLocation
-        {
-            public int MinionsHit;
-            public Vector2 Position;
-
-            public FarmLocation(Vector2 position, int minionsHit)
-            {
-                Position = position;
-                MinionsHit = minionsHit;
-            }
         }
     }
 }

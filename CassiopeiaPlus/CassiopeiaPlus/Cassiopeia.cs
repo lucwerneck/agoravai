@@ -7,6 +7,7 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
+using SharpDX;
 using Color = System.Drawing.Color;
 
 namespace CassiopeiaPlus
@@ -37,8 +38,8 @@ namespace CassiopeiaPlus
             }
 
             //SetSkillshots
-            Q.SetSkillshot(600, 40, -1, Spell.SkillshotType.Circular);
-            W.SetSkillshot(500, 90, 2500, Spell.SkillshotType.Circular);
+            Q.SetSkillshot(600, 150, -1, Spell.SkillshotType.Circular);
+            W.SetSkillshot(500, 250, 2500, Spell.SkillshotType.Circular);
             E.SetTargetted(200, -1);
             R.SetSkillshot(600, (int)(80*Math.PI/180), -1, Spell.SkillshotType.Cone);
             
@@ -116,10 +117,10 @@ namespace CassiopeiaPlus
                         Player.Instance.ServerPosition.To2D(), Q.Range)
                         .Where(h => !h.HasBuffOfType(BuffType.Poison))
                         .ToList();
-                var farmLocation = Q.GetCircularFarmLocation(minions.Select(h => h.ServerPosition.To2D()).ToList(), Q.Width*2);
+                var farmLocation = GetCircularFarmLocation(minions.ToArray(), Q);
                 if (farmLocation.MinionsHit >= 3)
                 {
-                    Player.CastSpell(Q.Slot, farmLocation.Position.To3D());
+                    Player.CastSpell(Q.Slot, farmLocation.Position);
                 }
             }
 
@@ -131,10 +132,10 @@ namespace CassiopeiaPlus
                         .Where(h => !h.HasBuffOfType(BuffType.Poison))
                         .ToList();
 
-                var farmLocation = W.GetCircularFarmLocation(minions.Select(h => h.ServerPosition.To2D()).ToList());
+                var farmLocation = GetCircularFarmLocation(minions.ToArray(), W);
                 if (farmLocation.MinionsHit >= 3)
                 {
-                    Player.CastSpell(W.Slot, farmLocation.Position.To3D());
+                    Player.CastSpell(W.Slot, farmLocation.Position);
                 }
             }
 
@@ -146,7 +147,7 @@ namespace CassiopeiaPlus
                         h =>
                             h.HasBuffOfType(BuffType.Poison) &&
                             h.Health < GetSpellDamage(SpellSlot.Q, h) &&
-                            Instances.GetPoisonBuffEndTime(h) < Game.Time + E.Delay && h.HasBuffOfType(BuffType.Poison) &&
+                            GetPoisonBuffEndTime(h) < Game.Time + E.Delay && h.HasBuffOfType(BuffType.Poison) &&
                             h.IsTargetable && Prediction.Health.GetPrediction(h, (int)E.Delay) > 0)
                     .OrderBy(h => h.Health)
                     .FirstOrDefault();
@@ -191,12 +192,12 @@ namespace CassiopeiaPlus
 
             if (ComboCassioMenu["cassioplus.combo.usee"].Cast<CheckBox>().CurrentValue)
             {
-                if (Instances.GetPoisonBuffEndTime(target) < Game.Time + E.Delay && target.HasBuffOfType(BuffType.Poison))
+                if (GetPoisonBuffEndTime(target) < Game.Time + E.Delay && target.HasBuffOfType(BuffType.Poison))
                 {
                     E.Cast(target);
                 }
                 else if (Player.Instance.ServerPosition.Distance(target) > E.Range ||
-                         Instances.GetPoisonBuffEndTime(target) >= Game.Time + E.Delay &&
+                         GetPoisonBuffEndTime(target) >= Game.Time + E.Delay &&
                             ComboCassioMenu["cassioplus.combo.changete"].Cast<CheckBox>().CurrentValue)
                 {
                     var targetE = HeroManager.Enemies
@@ -204,7 +205,7 @@ namespace CassiopeiaPlus
                             h =>
                                 h.IsValid && !h.IsInvulnerable &&
                                 h.ServerPosition.Distance(Player.Instance.ServerPosition) < E.Range &&
-                                Instances.GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
+                                GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
                                 target.HasBuffOfType(BuffType.Poison))
                         .OrderBy(h => h.Health)
                         .OrderBy(h => TargetSelector.GetPriority(h)).FirstOrDefault();
@@ -277,20 +278,20 @@ namespace CassiopeiaPlus
 
             if (E.Instance.IsReady && HarassCassioMenu["cassioplus.harass.q"].Cast<CheckBox>().CurrentValue)
             {
-                if (Instances.GetPoisonBuffEndTime(target) < Game.Time + E.Delay &&
+                if (GetPoisonBuffEndTime(target) < Game.Time + E.Delay &&
                     target.HasBuffOfType(BuffType.Poison))
                 {
                     Player.Instance.Spellbook.CastSpell(E.Slot, target);
                 }
                 else if (Player.Instance.ServerPosition.Distance(target) > E.Range ||
-                         Instances.GetPoisonBuffEndTime(target) >= Game.Time + E.Delay)
+                         GetPoisonBuffEndTime(target) >= Game.Time + E.Delay)
                 {
                     var targetE = ObjectManager.Get<AIHeroClient>()
                         .Where(
                             h =>
                                 h.IsValid && !h.IsInvulnerable && h.IsEnemy &&
                                 h.ServerPosition.Distance(Player.Instance.ServerPosition) < E.Range &&
-                                Instances.GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
+                                GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
                                 target.HasBuffOfType(BuffType.Poison))
                         .OrderBy(h => h.Health)
                         .OrderBy(h => TargetSelector.GetPriority(h)).FirstOrDefault();
@@ -343,7 +344,7 @@ namespace CassiopeiaPlus
                     EntityManager.GetJungleMonsters(Player.Instance.ServerPosition.To2D(), E.Range)
                         .Where(
                             h =>
-                                Instances.GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
+                                GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
                                 h.HasBuffOfType(BuffType.Poison))
                         .OrderByDescending(h => h.Health)
                         .FirstOrDefault();
@@ -369,12 +370,12 @@ namespace CassiopeiaPlus
             {
                 var minions =
                     EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy,
-                        Player.Instance.ServerPosition.To2D(), Q.Range).ToList();
+                        Player.Instance.ServerPosition.To2D(), Q.Range);
 
-                var farmLocation = Q.GetCircularFarmLocation(minions.Select(h => h.ServerPosition.To2D()).ToList(), Q.Width *2);
+                var farmLocation = GetCircularFarmLocation(minions.ToArray(), Q);
                 if (farmLocation.MinionsHit >= 3)
                 {
-                    Q.Cast(farmLocation.Position.To3D());
+                    Q.Cast(farmLocation.Position);
                 }
             }
 
@@ -384,10 +385,10 @@ namespace CassiopeiaPlus
                     EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy,
                         Player.Instance.ServerPosition.To2D(), W.Range).ToList();
 
-                var farmLocation = W.GetCircularFarmLocation(minions.Select(h => h.ServerPosition.To2D()).ToList());
+                var farmLocation = GetCircularFarmLocation(minions.ToArray(), W);
                 if (farmLocation.MinionsHit >= 3)
                 {
-                    W.Cast(farmLocation.Position.To3D());
+                    W.Cast(farmLocation.Position);
                 }
             }
 
@@ -400,11 +401,11 @@ namespace CassiopeiaPlus
                         .Where(
                             h =>
                                 h.HasBuffOfType(BuffType.Poison) &&
-                                Instances.GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
+                                GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
                                 h.HasBuffOfType(BuffType.Poison) &&
                                 h.IsTargetable &&
                                 Prediction.Health.GetPrediction(h, E.Delay*2) <= GetSpellDamage(SpellSlot.E, h) &&
-                                Prediction.Health.GetPrediction(h, E.Delay*2) > 0)
+                                Prediction.Health.GetPrediction(h, E.Delay*2 + (int)Player.Instance.AttackCastDelay) > 0)
                         .OrderBy(h => h.Health)
                         .FirstOrDefault();
 
@@ -420,7 +421,7 @@ namespace CassiopeiaPlus
                         .Where(
                             h =>
                                 h.HasBuffOfType(BuffType.Poison) &&
-                                Instances.GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
+                                GetPoisonBuffEndTime(h) < Game.Time + E.Delay &&
                                 h.HasBuffOfType(BuffType.Poison) &&
                                 h.IsTargetable &&
                                 (Prediction.Health.GetPrediction(h, E.Delay*2) < GetSpellDamage(SpellSlot.E, h) ||
@@ -644,6 +645,28 @@ namespace CassiopeiaPlus
             }
         }
 
+        private static FarmLocation GetCircularFarmLocation(Obj_AI_Base[] units, Spell spell)
+        {
+            if (!units.Any() || units == null)
+            {
+                return new FarmLocation
+                {
+                    MinionsHit = 0,
+                    Position = new Vector3()
+                };
+            }
+
+            var farmlocation =
+                Prediction.Position.PredictCircularMissileAoe(units, spell.Range, spell.Width, spell.Delay, spell.Speed)
+                    .OrderBy(h => h.CollisionObjects.Count(x => x.IsMinion)).FirstOrDefault();
+
+            return new FarmLocation
+            {
+                MinionsHit = farmlocation.CollisionObjects.Count(h => h.IsMinion),
+                Position = farmlocation.CastPosition
+            };
+        }
+
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo && !E.Instance.IsReady &&
@@ -653,5 +676,20 @@ namespace CassiopeiaPlus
             }
             //braumbuff //lichbane
         }
+
+        public static float GetPoisonBuffEndTime(Obj_AI_Base target)
+        {
+            var buffEndTime = target.Buffs.OrderByDescending(buff => buff.EndTime - Game.Time)
+                    .Where(buff => buff.Type == BuffType.Poison)
+                    .Select(buff => buff.EndTime)
+                    .FirstOrDefault();
+            return buffEndTime;
+        }
+    }
+
+    public class FarmLocation
+    {
+        public int MinionsHit { get; set; }
+        public Vector3 Position { get; set; }
     }
 }
