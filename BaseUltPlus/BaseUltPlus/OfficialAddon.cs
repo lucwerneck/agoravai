@@ -153,7 +153,7 @@ namespace BaseUltPlus
             {
                 if (Program.BaseUltMenu["checkcollision"].Cast<CheckBox>().CurrentValue && unit.Collision)
                 {
-                    return;
+                    continue;
                 }
 
                 if (unit.Unit.IsVisible)
