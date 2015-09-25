@@ -36,6 +36,8 @@ namespace BaseUltPlus
         {
             Program.BaseUltMenu["x"].Cast<Slider>().OnValueChange += OffsetOnOnValueChange;
             Program.BaseUltMenu["y"].Cast<Slider>().OnValueChange += OffsetOnOnValueChange;
+            UpdateOffset(Program.BaseUltMenu["x"].Cast<Slider>().CurrentValue, Program.BaseUltMenu["y"].Cast<Slider>().CurrentValue);
+
             Text = new EloBuddy.SDK.Rendering.Text("", new FontDescription
             {
                 FaceName = "Calibri",
@@ -83,12 +85,18 @@ namespace BaseUltPlus
         {
             if (sender.SerializationId == Program.BaseUltMenu["x"].Cast<Slider>().SerializationId)
             {
-                X = (int) TacticalMap.X + (- 20 + args.NewValue);
+                UpdateOffset(args.NewValue);
             }
             else
             {
-                Y = (int)TacticalMap.Y + (- 200+args.NewValue);
+                UpdateOffset(0, args.NewValue);
             }
+        }
+
+        private static void UpdateOffset(int x, int y = 0)
+        {
+            X = (int)TacticalMap.X + (-20 + x);
+            Y = (int)TacticalMap.Y + (-200 + y);
         }
 
         public static void OnUpdate()
